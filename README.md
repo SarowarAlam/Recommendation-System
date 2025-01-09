@@ -1,130 +1,126 @@
-# **1. Introduction**
+# Movie Recommendation System Report
 
-The goal of this project is to implement a recommendation system using Content-Based Filtering and Collaborative Filtering techniques. As an example the system leverages the MovieLens dataset to recommend movies based on movie content or user preferences.
+## **Overview**
 
-# **2. Dataset Overview**
+This project implements a **Movie Recommendation System** using two techniques:
+1. **Content-Based Filtering**: Recommends movies similar to a given movie by analyzing its content, such as title and genres.
+2. **Collaborative Filtering**: Suggests movies based on user preferences and ratings using a matrix factorization technique.
 
-The MovieLens dataset includes two files:
+---
 
-*movies.csv:*
+## **Technologies Used**
+- **Python**: Primary programming language for implementation.
+- **Pandas**: For data manipulation and preprocessing.
+- **Scikit-learn**: For vectorization and similarity computation in Content-Based Filtering.
+- **Surprise**: For Collaborative Filtering using the SVD (Singular Value Decomposition) model.
+- **TF-IDF**: To convert text features (title and genres) into numerical data for similarity computations.
 
-movieId: Unique identifier for each movie.
-title: The movie title and release year.
-genres: A pipe-separated list of movie genres.
-ratings.csv:
+---
 
-userId: Unique identifier for each user.
-movieId: The ID of the rated movie.
-rating: The user's rating for the movie, on a scale of 0.5 to 5.
-timestamp: The time the rating was provided (not used in this implementation).
+## **Dataset**
+This project uses the **MovieLens dataset**, which is a benchmark dataset for recommendation systems.
 
-# **3. Methodology**
+### **Dataset Details**
+1. **movies.csv**:
+   - `movieId`: Unique identifier for each movie.
+   - `title`: Movie title with release year.
+   - `genres`: Genres associated with the movie (pipe-separated).
 
-**3.1 Content-Based Filtering**
+2. **ratings.csv**:
+   - `userId`: Unique identifier for each user.
+   - `movieId`: ID of the rated movie.
+   - `rating`: User rating on a scale from 0.5 to 5.0.
 
-Content-based filtering recommends movies similar to a user's preferred movie by analyzing movie features (e.g., title and genres).
+Dataset link: [MovieLens](https://grouplens.org/datasets/movielens/)
 
-*Steps:*
+---
 
-Feature Engineering:
+## **Project Features**
 
-The title and genres columns are combined into a new content column for each movie.
-TF-IDF Vectorization:
+### **1. Content-Based Filtering**
+**Objective**: Recommend movies similar to a given movie based on its metadata (title and genres).
 
-The content column is vectorized using TF-IDF (Term Frequency-Inverse Document Frequency) to convert text into numerical vectors.
-TF-IDF emphasizes rare and important terms, reducing the weight of common words.
-Cosine Similarity:
+**Methodology**:
+1. Combine the `title` and `genres` into a single feature (`combined_features`).
+2. Use **TF-IDF vectorization** to convert textual data into numerical form.
+3. Compute pairwise **cosine similarity** between movies based on the TF-IDF vectors.
+4. Recommend the top 5 movies with the highest similarity scores.
 
-Computes cosine similarity between movies' TF-IDF vectors, quantifying how similar movies are based on their content.
-Recommendation Function:
+**Example**:  
+For the movie `"Toy Story (1995)"`, the system recommended:
+- **Toy Story 2 (1999)**
+- **Toy, The (1982)**
+- **We’re Back! A Dinosaur’s Story (1993)**
+- **NeverEnding Story, The (1984)**
+- **Monsters, Inc. (2001)**
 
-For a given movie_title, retrieves similar movies using cosine similarity scores.
-Returns the top 5 most similar movies.
+---
 
-Example Recommendation:
+### **2. Collaborative Filtering**
+**Objective**: Suggest movies to a user based on their rating history and patterns observed in other users' ratings.
 
-For the movie "Toy Story (1995)", the system identifies movies with similar genres or themes.
+**Methodology**:
+1. Train the **SVD (Singular Value Decomposition)** model on the ratings dataset.
+2. Predict ratings for movies that the user has not rated.
+3. Sort the predicted ratings and recommend the top 5 movies with the highest predicted scores.
 
-**3.2 Collaborative Filtering**
+**Evaluation**:
+- The model achieved an **RMSE (Root Mean Squared Error)** of **0.7756**, which indicates a good level of accuracy in predicting user preferences.
 
-Collaborative filtering predicts user preferences by leveraging the ratings of users with similar preferences.
+**Example**:  
+For `user_id=1`, the system recommended:
+- **Alien (1979)**
+- **Psycho (1960)**
+- **Jaws (1975)**
+- **Thing from Another World, The (1951)**
+- **All That Heaven Allows (1955)**
 
-*Steps:*
+---
 
-**Dataset Preparation:**
+## **Results Summary**
 
-The ratings dataset is formatted for the Surprise library, defining the rating scale (0.5 to 5) using the Reader class.
-Train-Test Split:
+| **Technique**            | **Example Input**          | **Recommendations** (Top 5 Movies)                       |
+|--------------------------|---------------------------|---------------------------------------------------------|
+| Content-Based Filtering  | Toy Story (1995)          | Toy Story 2 (1999), Toy (1982), NeverEnding Story (1984), Monsters, Inc. (2001) |
+| Collaborative Filtering   | User ID: 1               | Alien (1979), Psycho (1960), Jaws (1975), All That Heaven Allows (1955)         |
 
-The dataset is split into training (75%) and testing (25%) sets.
-SVD Model:
+---
 
-Trains an SVD (Singular Value Decomposition) model on the training set.
-Learns latent features that represent users and movies to predict user ratings.
-Evaluation:
+## **Limitations**
+1. **Content-Based Filtering**:
+   - Relies only on the movie's metadata (title and genres) and cannot consider user-specific preferences.
+   - Cannot recommend movies that are dissimilar in content but highly rated by the user.
 
-The model is tested on the test set, and its performance is evaluated using RMSE (Root Mean Squared Error).
-Recommendation Function:
+2. **Collaborative Filtering**:
+   - Struggles with the **cold start problem**, as it requires sufficient data on new users or movies.
+   - Predictions are limited to the scope of the training data (existing user-movie interactions).
 
-For a given user_id, identifies unrated movies and predicts their ratings.
-Returns the top 5 movies with the highest predicted ratings.
-Example Recommendation:
-For user_id=1, the system suggests movies the user is likely to enjoy based on ratings from other users with similar preferences.
+3. **Data Constraints**:
+   - For testing purposes, only the first 10,000 movies were used.
 
-# **4. Results**
-**4.1 Content-Based Recommendations**
+---
 
-For "Toy Story (1995)", the system recommends movies with similar content, such as:
+## **Future Improvements**
+1. **Hybrid Recommendation System**:
+   - Combine Content-Based and Collaborative Filtering techniques for better recommendations.
+2. **Deep Learning**:
+   - Use neural networks (e.g., autoencoders) to extract deeper relationships between users and movies.
+3. **Enhanced Metadata**:
+   - Include additional attributes like director, cast, reviews, and user demographics to improve recommendation accuracy.
+4. **Context-Aware Recommendations**:
+   - Factor in contextual information, such as time of day or user location.
 
-"Toy Story 2 (1999)"
-"A Bug's Life (1998)"
-"Monsters, Inc. (2001)"
-"Finding Nemo (2003)"
-"The Incredibles (2004)"
+---
 
-**4.2 Collaborative Filtering Recommendations**
+## **Usage**
+To replicate this project:
+1. Download the [MovieLens dataset](https://grouplens.org/datasets/movielens/).
+2. Update the dataset file paths in the script to point to the correct location on your system.
+3. Install required Python libraries:
+   ```bash
+   pip install pandas scikit-learn surprise
+   ```
+4. Run the script and test the recommendations.
 
-For user_id=1, the system recommends movies based on predicted ratings, such as:
+---
 
-"The Matrix (1999)"
-"Inception (2010)"
-"The Dark Knight (2008)"
-"Pulp Fiction (1994)"
-"Forrest Gump (1994)"
-
-**4.3 Model Evaluation**
-
-RMSE (Collaborative Filtering):
-The RMSE score for the SVD model on the test set was approximately 0.7753.
-This low RMSE indicates that the model predicts user ratings with high accuracy.
-
-# **5. Limitations**
-*Content-Based Filtering:*
-
-Only considers movie metadata (title and genres).
-Cannot recommend movies with different themes or genres.
-Ignores user preferences and past behavior.
-Collaborative Filtering:
-
-Requires sufficient user rating data to make accurate predictions.
-Struggles with the cold start problem for new users or movies with no ratings.
-Data Size:
-
-Due to resource constraints, only the first 10,000 movies were used for testing.
-
-# **6. Future Improvements**
-Hybrid Recommendation System:
-
-Combine content-based and collaborative filtering to leverage the strengths of both.
-Deep Learning:
-
-Use neural networks, such as autoencoders, to capture more complex patterns in user behavior.
-Context-Aware Recommendations:
-
-Incorporate contextual information, such as time, location, or user demographics.
-Expanded Metadata:
-
-Enrich movie features with additional attributes (e.g., director, cast, reviews).
-
-# **7. Conclusion**
-This project demonstrates the application of Content-Based Filtering and Collaborative Filtering in building a movie recommendation system. Content-based filtering effectively identifies movies similar to a user's preferred movie, while collaborative filtering provides personalized recommendations based on user behavior. The SVD model's RMSE score of 0.7753 highlights its accuracy and potential for real-world applications. Together, these approaches form a robust foundation for advanced recommendation systems.
